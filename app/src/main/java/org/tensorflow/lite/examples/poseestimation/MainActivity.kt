@@ -22,6 +22,7 @@ import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Process
+import android.util.Log
 import android.view.SurfaceView
 import android.view.View
 import android.view.WindowManager
@@ -187,14 +188,20 @@ class MainActivity : AppCompatActivity() {
                 cameraSource =
                     CameraSource(surfaceView, object : CameraSource.CameraSourceListener {
                         override fun onFPSListener(fps: Int) {
-                            tvFPS.text = getString(R.string.tfe_pe_tv_fps, fps)
+                            runOnUiThread {
+                                tvFPS.text = getString(R.string.tfe_pe_tv_fps, fps)
+                            }
                         }
 
                         override fun onDetectedInfo(
                             personScore: Float?,
                             poseLabels: List<Pair<String, Float>>?
                         ) {
-                            tvScore.text = getString(R.string.tfe_pe_tv_score, personScore ?: 0f)
+                            runOnUiThread {
+                                tvScore.text =
+                                    getString(R.string.tfe_pe_tv_score, personScore ?: 0f)
+                            }
+
                             poseLabels?.sortedByDescending { it.second }?.let {
                                 tvClassificationValue1.text = getString(
                                     R.string.tfe_pe_tv_classification_value,
@@ -308,6 +315,7 @@ class MainActivity : AppCompatActivity() {
                 showTracker(false)
                 MoveNet.create(this, device, ModelType.Lightning)
             }
+
             1 -> {
                 // MoveNet Thunder (SinglePose)
                 showPoseClassifier(true)
@@ -315,6 +323,7 @@ class MainActivity : AppCompatActivity() {
                 showTracker(false)
                 MoveNet.create(this, device, ModelType.Thunder)
             }
+
             2 -> {
                 // MoveNet (Lightning) MultiPose
                 showPoseClassifier(false)
@@ -330,6 +339,7 @@ class MainActivity : AppCompatActivity() {
                     Type.Dynamic
                 )
             }
+
             3 -> {
                 // PoseNet (SinglePose)
                 showPoseClassifier(true)
@@ -337,6 +347,7 @@ class MainActivity : AppCompatActivity() {
                 showTracker(false)
                 PoseNet.create(this, device)
             }
+
             else -> {
                 null
             }
@@ -389,6 +400,7 @@ class MainActivity : AppCompatActivity() {
                 // You can use the API that requires the permission.
                 openCamera()
             }
+
             else -> {
                 // You can directly ask for the permission.
                 // The registered ActivityResultCallback gets the result of this request.

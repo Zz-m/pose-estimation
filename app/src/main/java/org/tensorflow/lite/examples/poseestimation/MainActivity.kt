@@ -37,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.tensorflow.lite.examples.poseestimation.camera.CameraSource
 import org.tensorflow.lite.examples.poseestimation.data.Device
+import org.tensorflow.lite.examples.poseestimation.data.Person
 import org.tensorflow.lite.examples.poseestimation.ml.*
 
 class MainActivity : AppCompatActivity() {
@@ -218,6 +219,10 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
 
+                    },object: CameraSource.PersonDetectedListener {
+                        override fun onPersonDetect(person: Person) {
+                            Log.e("TAG", "get person:" + person)
+                        }
                     }).apply {
                         prepareCamera()
                     }

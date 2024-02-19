@@ -46,7 +46,8 @@ import kotlin.coroutines.resumeWithException
 
 class CameraSource(
     private val surfaceView: SurfaceView,
-    private val listener: CameraSourceListener? = null
+    private val listener: CameraSourceListener? = null,
+    private val personDetectedListener: PersonDetectedListener? = null,
 ) {
 
     companion object {
@@ -265,6 +266,9 @@ class CameraSource(
         // if the model returns only one item, show that item's score.
         if (persons.isNotEmpty()) {
             listener?.onDetectedInfo(persons[0].score, classificationResult)
+            for (person in persons) {
+                personDetectedListener?.onPersonDetect(person)
+            }
         }
         visualize(persons, bitmap)
     }
@@ -323,5 +327,9 @@ class CameraSource(
         fun onFPSListener(fps: Int)
 
         fun onDetectedInfo(personScore: Float?, poseLabels: List<Pair<String, Float>>?)
+    }
+
+    interface PersonDetectedListener {
+        fun onPersonDetect(person: Person)
     }
 }

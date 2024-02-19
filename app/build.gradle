@@ -46,6 +46,7 @@ dependencies {
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
     implementation 'org.tensorflow:tensorflow-lite:2.15.0'
     implementation 'org.tensorflow:tensorflow-lite-gpu:2.15.0'
+    implementation 'org.tensorflow:tensorflow-lite-gpu-api:2.15.0'
     implementation 'org.tensorflow:tensorflow-lite-support:0.4.4'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

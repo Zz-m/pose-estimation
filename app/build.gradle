@@ -1,11 +1,12 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
+    namespace 'org.tensorflow.lite.examples.poseestimation'
 
     defaultConfig {
         applicationId "org.tensorflow.lite.examples.poseestimation"

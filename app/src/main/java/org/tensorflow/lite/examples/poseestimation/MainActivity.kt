@@ -36,9 +36,11 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.tensorflow.lite.examples.poseestimation.camera.CameraSource
+import org.tensorflow.lite.examples.poseestimation.component.CSVDataRecorder
 import org.tensorflow.lite.examples.poseestimation.data.Device
 import org.tensorflow.lite.examples.poseestimation.data.Person
 import org.tensorflow.lite.examples.poseestimation.ml.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -59,6 +61,9 @@ class MainActivity : AppCompatActivity() {
     /** Default device is CPU */
     private var device = Device.CPU
 
+    private val startRecordData = AtomicBoolean(false)
+    private var csvDataRecorder:CSVDataRecorder? = null
+
     private lateinit var tvScore: TextView
     private lateinit var tvFPS: TextView
     private lateinit var spnDevice: Spinner
@@ -70,6 +75,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvClassificationValue3: TextView
     private lateinit var swClassification: SwitchCompat
     private lateinit var vClassificationOption: View
+    private lateinit var btnStartRecord:Button
     private var cameraSource: CameraSource? = null
     private var isClassifyPose = false
     private val requestPermissionLauncher =
@@ -132,6 +138,18 @@ class MainActivity : AppCompatActivity() {
             isPoseClassifier()
         }
 
+    private val startRecordBtnListener = View.OnClickListener { _ ->
+        if (startRecordData.get()) {
+            btnStartRecord.text = "start record"
+            csvDataRecorder?.close()
+            startRecordData.set(false)
+        } else {
+            btnStartRecord.text = "stop record"
+            csvDataRecorder = CSVDataRecorder(this)
+            startRecordData.set(true)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -149,9 +167,11 @@ class MainActivity : AppCompatActivity() {
         tvClassificationValue3 = findViewById(R.id.tvClassificationValue3)
         swClassification = findViewById(R.id.swPoseClassification)
         vClassificationOption = findViewById(R.id.vClassificationOption)
+        btnStartRecord = findViewById(R.id.btn_start_record)
         initSpinner()
         spnModel.setSelection(modelPos)
         swClassification.setOnCheckedChangeListener(setClassificationListener)
+        btnStartRecord.setOnClickListener(startRecordBtnListener)
         if (!isCameraPermissionGranted()) {
             requestPermission()
         }
@@ -221,7 +241,9 @@ class MainActivity : AppCompatActivity() {
 
                     },object: CameraSource.PersonDetectedListener {
                         override fun onPersonDetect(person: Person) {
-                            Log.e("TAG", "get person:" + person)
+                            if (startRecordData.get()) {
+                                csvDataRecorder?.append(person)
+                            }
                         }
                     }).apply {
                         prepareCamera()
